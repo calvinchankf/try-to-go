@@ -52,8 +52,25 @@ func main() {
 	rows, err = db.Query(`SELECT * FROM public.user`)
 	checkErr(err)
 
+	var id string
 	for rows.Next() {
-		var id string
+		// var id string
+		var username string
+		var password string
+		var createdTimestamp string                                                   // can be string
+		var lastTimestamp time.Time                                                   // or can be Date
+		err = rows.Scan(&id, &username, &password, &createdTimestamp, &lastTimestamp) // all fields must be filled in order to be Scan() or an error
+		checkErr(err)
+		fmt.Printf("%v %v %v %v %v \n", id, username, password, createdTimestamp, lastTimestamp)
+	}
+
+	fmt.Printf("update row %s \n", id)
+	// stmt, err := db.Prepare("update public.user set username=$1 where id=$2 returning *")
+	// res, err := stmt.Exec("cal cal cal", id)
+	rows, err = db.Query("update public.user set username=$1 where id=$2 returning *", "cal", id)
+	checkErr(err)
+	for rows.Next() {
+		// var id string
 		var username string
 		var password string
 		var createdTimestamp string                                                   // can be string
