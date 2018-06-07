@@ -6,7 +6,7 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
-func main() {
+func excel() {
 	fmt.Printf("Hello, world.\n")
 
 	excelFileName := "asset/combine.xlsx"

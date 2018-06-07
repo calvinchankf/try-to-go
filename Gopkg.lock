@@ -2,6 +2,15 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid"
+  ]
+  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+
+[[projects]]
   name = "github.com/tealeg/xlsx"
   packages = ["."]
   revision = "8be35264fa75a1bbe954ce51eba04f273e2c59e5"
@@ -10,6 +19,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ac8a23a08b92cf25234b5b72dbefae4e8a6dd453d9affff27b41d610802d1649"
+  inputs-digest = "8a01da43c3244c6fc880cc32dc18ffd69388eb036c1f125e17a3183b42433bd2"
   solver-name = "gps-cdcl"
   solver-version = 1
