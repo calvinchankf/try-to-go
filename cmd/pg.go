@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"database/sql"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -14,7 +15,26 @@ const (
 	DB_NAME     = "bauhaus"
 )
 
-func main() {
+var pgCmd = &cobra.Command{
+	Use:   "pg",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("pg called")
+		pg()
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(pgCmd)
+}
+
+func pg() {
 	fmt.Println("try PQ")
 
 	// connStr := "postgres://calvin:handsome@localhost:5432/bauhaus?sslmode=disable"
