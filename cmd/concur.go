@@ -12,17 +12,9 @@ var concurCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 		// trySum()
-		var c chan string = make(chan string)
+		// pingPong()
 
-		// Using a channel like this synchronizes the two goroutines.
-		// When pinger attempts to send a message on the channel it will wait until printer is ready to receive the message.
-		// (this is known as blocking)
-		go pinger(c)
-		go ponger(c)
-		go printer(c)
-
-		var input string
-		fmt.Scanln(&input)
+		selec()
 	},
 }
 
@@ -55,6 +47,19 @@ func sum(a []int, c chan int) {
 }
 
 // goroutine 102
+func pingPong() {
+	var c chan string = make(chan string)
+
+	// Using a channel like this synchronizes the two goroutines.
+	// When pinger attempts to send a message on the channel it will wait until printer is ready to receive the message.
+	// (this is known as blocking)
+	go pinger(c)
+	go ponger(c)
+	go printer(c)
+
+	var input string
+	fmt.Scanln(&input)
+}
 
 func pinger(c chan<- string) {
 	for i := 0; ; i++ {
@@ -74,4 +79,39 @@ func printer(c <-chan string) {
 		fmt.Println(msg)
 		time.Sleep(time.Second * 1)
 	}
+}
+
+// select
+
+func selec() {
+	c1 := make(chan string)
+	c2 := make(chan string)
+
+	go func() {
+		for {
+			c1 <- "every 1 sec"
+			time.Sleep(time.Second * 1)
+		}
+	}()
+
+	go func() {
+		for {
+			c2 <- "every 3 sec"
+			time.Sleep(time.Second * 3)
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case msg1 := <-c1:
+				fmt.Println(msg1)
+			case msg2 := <-c2:
+				fmt.Println(msg2)
+			}
+		}
+	}()
+
+	var input string
+	fmt.Scanln(&input)
 }
