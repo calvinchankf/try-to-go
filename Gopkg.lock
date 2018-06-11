@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/jasonlvhit/gocron"
+  packages = ["."]
+  revision = "54194c9749d48b073c9aeb2c787b6882e95dd0cd"
+
+[[projects]]
+  branch = "master"
   name = "github.com/lib/pq"
   packages = [
     ".",
@@ -43,6 +49,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a28f33eb0cf8a2f11ac28f3eded6c174c8a539f5e3191007409f1c7ae76a3a2d"
+  inputs-digest = "9070347d2ad59edeb362a6bda15f8f73f605803a3eb33906ec3d2d44e5cffaac"
   solver-name = "gps-cdcl"
   solver-version = 1
