@@ -26,6 +26,6 @@ func sch() {
 	c := cron.New()
 	c.AddFunc("* * * * * *", func() { fmt.Println("Every sec") })
 	c.Start()
-	// c.Stop()
+	defer c.Stop()
 	select {}
 }
