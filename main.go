@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
-	fmt.Println("hello world")
+	// golang int64 = postgres biginit in range
+	a := 9223372036854775807
+	fmt.Println("hello world", a)
 	cmd.Execute()
 }
