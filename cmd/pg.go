@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -26,12 +27,19 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("pg called")
-		pg()
+		// pg()
+		upsert()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(pgCmd)
+}
+
+func checkErr(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 func pg() {
@@ -101,8 +109,30 @@ func pg() {
 	}
 }
 
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
+func upsert() {
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
+	db, err := sql.Open("postgres", dbinfo)
+	checkErr(err)
+	defer db.Close()
+
+	var hashtable = make(map[string]string)
+	hashtable["a"] = "calvi"
+	hashtable["b"] = "calvin"
+	hashtable["c"] = "calvinn"
+
+	// marshal
+	jsonObj, _ := json.Marshal(hashtable)
+
+	var userid string
+	err = db.QueryRow(`
+		INSERT INTO public.orders (code, raw_data) VALUES ($1, $2)
+		ON CONFLICT (code)
+		DO UPDATE SET raw_data = $2
+		RETURNING id
+		`,
+		"calvin_code",
+		jsonObj,
+	).Scan(&userid)
+	checkErr(err)
+	fmt.Println(userid)
 }

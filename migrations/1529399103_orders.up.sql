@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS orders (
     code text NOT NULL,
     raw_data jsonb,
     created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    updated_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE UNIQUE INDEX ON orders (code);
