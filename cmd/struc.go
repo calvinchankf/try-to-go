@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -11,24 +12,27 @@ var strucCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("struc called")
-
-		var ptr *int
-		if ptr != nil {
-			fmt.Println("has")
-		} else {
-			fmt.Println("has not")
-		}
-
-		i := 1
-		ptr = &i
-		fmt.Println(*ptr)
-
-		struc()
+		// haha()
+		// struc()
+		playUnwrap()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(strucCmd)
+}
+
+func haha() {
+	var ptr *int
+	if ptr != nil {
+		fmt.Println("has")
+	} else {
+		fmt.Println("has not")
+	}
+
+	i := 1
+	ptr = &i
+	fmt.Println(*ptr)
 }
 
 // class
@@ -58,10 +62,6 @@ func (f Ferrari) Formula() *int {
 // try construct
 
 func struc() {
-	// a := "calvin"
-	// var a string
-	// a_ptr := &a
-
 	ferrari := Ferrari{
 		Car{
 			returnStringAdd("calvin"),
@@ -69,7 +69,7 @@ func struc() {
 		},
 		returnIntAdd(2),
 	}
-	fmt.Println("ff", *ferrari.name)
+	fmt.Println("ff", ferrari.name)
 	fmt.Println("ff", ferrari.price)
 	fmt.Println("ff", ferrari.formula)
 
@@ -83,6 +83,12 @@ func struc() {
 	fmt.Println("ff", benzi.name)
 	fmt.Println("ff", benzi.price)
 	fmt.Println("ff", benzi.formula)
+
+	one := allocExcelInt("1")
+	fmt.Println(one)
+
+	nullll := allocExcelInt("")
+	fmt.Println(nullll)
 }
 
 func returnStringAdd(value string) *string {
@@ -98,4 +104,28 @@ func returnFloatAdd(value float64) *float64 {
 func returnIntAdd(value int) *int {
 	a := value
 	return &a
+}
+
+func allocExcelInt(value string) *int {
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		return nil
+	}
+	temp := i
+	return &temp
+}
+
+func unwrapStr(value *string) interface{} {
+	if value != nil {
+		return *value
+	}
+	return nil
+}
+
+func playUnwrap() {
+	// var a string
+	fmt.Println("😂", unwrapStr(nil))
+
+	calvin := "calvin"
+	fmt.Println("😂", unwrapStr(&calvin))
 }
