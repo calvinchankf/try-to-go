@@ -118,21 +118,71 @@ func upsert() {
 	var hashtable = make(map[string]string)
 	hashtable["a"] = "calvi"
 	hashtable["b"] = "calvin"
-	hashtable["c"] = "calvinn"
+	hashtable["c"] = "calvin_c"
 
 	// marshal
 	jsonObj, _ := json.Marshal(hashtable)
 
-	var userid string
+	var id string
+	var actionFlag string
+
+	// insert or update every time
+	// err = db.QueryRow(`
+	// 	INSERT INTO public.orders (code, raw_data) VALUES ($1, $2)
+	// 	ON CONFLICT (code)
+	// 	DO UPDATE SET raw_data = $2
+	// 	RETURNING id
+	// 	`,
+	// 	"calvin_code",
+	// 	jsonObj,
+	// ).Scan(&userid)
+
+	// inserted, updated, none
 	err = db.QueryRow(`
-		INSERT INTO public.orders (code, raw_data) VALUES ($1, $2)
-		ON CONFLICT (code)
-		DO UPDATE SET raw_data = $2
-		RETURNING id
+		WITH inserted AS (
+			INSERT INTO public.orders (code, what, raw_data) VALUES ($1, $2, $3)
+			ON CONFLICT (code) DO NOTHING
+			RETURNING id
+		),
+		updated AS (
+			UPDATE public.orders t
+			SET
+				what = $2,
+				raw_data = $3
+			WHERE code = $1
+			AND (
+				MD5(CAST((
+					$2,
+					$3::jsonb
+				) AS TEXT))
+			) IS DISTINCT FROM (
+				SELECT MD5(CAST((
+					what,
+					raw_data
+				) AS TEXT))
+				FROM public.orders
+				WHERE code = $1
+			)
+			RETURNING t.id
+		),
+		none AS (
+			SELECT id
+			FROM public.orders
+			WHERE code = $1
+			AND what = $2
+			AND raw_data = $3
+		)
+		SELECT id, 'inserted' AS action_flag FROM inserted
+		UNION
+		SELECT id, 'updated' AS action_flag FROM updated
+		UNION
+		SELECT id, 'none' AS action_flag FROM none
 		`,
 		"calvin_code",
+		"whateve",
 		jsonObj,
-	).Scan(&userid)
+	).Scan(&id, &actionFlag)
+
 	checkErr(err)
-	fmt.Println(userid)
+	fmt.Println(id, actionFlag)
 }
