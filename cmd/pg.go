@@ -168,16 +168,15 @@ func upsert() {
 			WHERE t.code = temp.code
 			AND (
 				SELECT MD5(CAST((
-					what,
-					raw_data
+					temp.what,
+					temp.raw_data
 				) AS TEXT))
-				FROM temp
 			) IS DISTINCT FROM (
 				SELECT MD5(CAST((
-					what,
-					raw_data
+					t.what,
+					t.raw_data
 				) AS TEXT))
-				FROM public.orders
+				FROM temp
 				WHERE code = temp.code
 			)
 			RETURNING t.*
