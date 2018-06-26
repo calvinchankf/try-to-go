@@ -139,44 +139,59 @@ func upsert() {
 
 	// inserted, updated, none
 	err = db.QueryRow(`
-		WITH inserted AS (
-			INSERT INTO public.orders (code, what, raw_data) VALUES ($1, $2, $3)
+		WITH temp AS (
+			SELECT * FROM (VALUES (
+				$1,
+				$2,
+				$3::jsonb
+			)) AS temp (
+				code,
+				what,
+				raw_data
+			)
+		), inserted AS (
+			INSERT INTO public.orders 
+			(
+				code, 
+				what, 
+				raw_data
+			)
+			SELECT * FROM temp
 			ON CONFLICT (code) DO NOTHING
-			RETURNING id
-		),
-		updated AS (
+			RETURNING *
+		), updated AS (
 			UPDATE public.orders t
 			SET
-				what = $2,
-				raw_data = $3
-			WHERE code = $1
+				what = temp.what,
+				raw_data = temp.raw_data
+			FROM temp
+			WHERE t.code = temp.code
 			AND (
-				MD5(CAST((
-					$2,
-					$3::jsonb
+				SELECT MD5(CAST((
+					what,
+					raw_data
 				) AS TEXT))
+				FROM temp
 			) IS DISTINCT FROM (
 				SELECT MD5(CAST((
 					what,
 					raw_data
 				) AS TEXT))
 				FROM public.orders
-				WHERE code = $1
+				WHERE code = temp.code
 			)
-			RETURNING t.id
-		),
-		none AS (
-			SELECT id
-			FROM public.orders
-			WHERE code = $1
-			AND what = $2
-			AND raw_data = $3
+			RETURNING t.*
 		)
-		SELECT id, 'inserted' AS action_flag FROM inserted
+		SELECT code, 'inserted' as action_flag FROM inserted
 		UNION
-		SELECT id, 'updated' AS action_flag FROM updated
+		SELECT code, 'updated' as action_flag FROM updated
 		UNION
-		SELECT id, 'none' AS action_flag FROM none
+		SELECT code, 'none' AS action_flag FROM temp
+		WHERE temp.code NOT IN (
+			SELECT code FROM inserted
+			UNION
+			SELECT code FROM updated
+		)
 		`,
 		"calvin_code",
 		"whateve",
